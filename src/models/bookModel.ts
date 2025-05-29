@@ -8,6 +8,6 @@ const bookSchema = new Schema({
   available: { type: Boolean, default: true },
 });
 
-const Book = model("Book", bookSchema);
+const BookModel = model("Book", bookSchema);
 
-export { Book };
+export { BookModel };
