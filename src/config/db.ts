@@ -1,7 +1,9 @@
 import { connect } from "mongoose";
-process.loadEnvFile();
+import dotenv from "dotenv";
 
-const URI_DB = process.env.URI_DB || "mongodb://localhost:27017/api-book";
+dotenv.config();
+
+const URI_DB = process.env.URI_DB || "mongodb://localhost:27017/biblioteca";
 
 const connectDb = async () => {
   try {

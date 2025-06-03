@@ -15,4 +15,4 @@ router.post("/books", createBook);
 router.patch("/books/:id", updateBook);
 router.delete("/books/:id", deleteBook);
 
-export default router;
+export { router as bookRoutes };
