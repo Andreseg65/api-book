@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { BookModel } from "../models/bookModel";
 import { successResponse, errorResponse } from "../utils/response";
+import {
+  validateBookData,
+  validatePartialBookData,
+} from "../validations/bookValidation";
 
 // const getBooks = async (_req: Request, res: Response): Promise<any> => {
 //   try {
@@ -46,30 +50,67 @@ const getBookById = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
+// const createBook = async (req: Request, res: Response): Promise<any> => {
+//   try {
+//     const newBook = new BookModel(req.body);
+//     const saved = await newBook.save();
+//     return res.status(201).json(saved);
+//   } catch (error) {
+//     return res.status(400).json({
+//       success: false,
+//       message: (error as Error).message,
+//     });
+//   }
+// };
+
+// Acá estoy probando la validación de datos con Zod para asegurarme de que los datos del libro sean correctos.
 const createBook = async (req: Request, res: Response): Promise<any> => {
   try {
-    const newBook = new BookModel(req.body);
-    const saved = await newBook.save();
-    return res.status(201).json(saved);
+    const validator = validateBookData.safeParse(req.body);
+    if (!validator.success) {
+      return res.status(400).json({
+        success: false,
+        message: validator.error?.issues,
+      });
+    }
+
+    const book = new BookModel(validator.data);
+    const saved = await book.save();
+    res.status(201).json(saved);
   } catch (error) {
-    return res.status(400).json({
-      success: false,
-      message: (error as Error).message,
-    });
+    res.status(500).json({ message: "Error interno al crear el libro" });
   }
 };
 
+// const updateBook = async (req: Request, res: Response): Promise<any> => {
+//   try {
+//     const updated = await BookModel.findByIdAndUpdate(req.params.id, req.body, {
+//       new: true,
+//     });
+//     if (!updated)
+//       return res.status(404).json({
+//         success: false,
+//         message: "Libro no encontrado",
+//       });
+//     return res.json(updated);
+//   } catch (error) {
+//     const err = error as Error;
+//     return res.status(400).json({
+//       success: false,
+//       message: err.message,
+//     });
+//   }
+// };
+
 const updateBook = async (req: Request, res: Response): Promise<any> => {
   try {
-    const updated = await BookModel.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
-    if (!updated)
-      return res.status(404).json({
+    const validator = validatePartialBookData.safeParse(req.body);
+    if (!validator.success) {
+      return res.status(400).json({
         success: false,
-        message: "Libro no encontrado",
+        message: validator.error?.issues,
       });
-    return res.json(updated);
+    }
   } catch (error) {
     const err = error as Error;
     return res.status(400).json({
